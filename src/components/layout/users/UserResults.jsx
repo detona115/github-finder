@@ -8,7 +8,7 @@ function UserResults() {
 
   useEffect(() => {
     fetchUsers();
-  }, );
+  }, []);
 
   return loading ? (
     <Spinner />
@@ -17,6 +17,7 @@ function UserResults() {
       {users.map((user) => (
         <UserItem key={user.id} user={user} />
       ))}
+      {/* {console.log(users)} */}
     </div>
   );
 }
