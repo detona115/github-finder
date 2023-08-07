@@ -11,6 +11,7 @@ export const GithubProvider = ({ children }) => {
   // const [loading, setLoading] = useState(true);
   const initialState = {
     users: [],
+    user: {},
     loading: false,
   };
 
@@ -20,8 +21,8 @@ export const GithubProvider = ({ children }) => {
   const ClearResults = () => {
     dispatch({
       type: 'CLEAR_RESULTS',
-    })
-  }
+    });
+  };
 
   // Get search results
   const searchUsers = async (text) => {
@@ -35,13 +36,34 @@ export const GithubProvider = ({ children }) => {
       },
     });
 
-    const {items} = await response.json();
+    const { items } = await response.json();
     // setUsers(data);
     // setLoading(false);
     dispatch({
       type: 'GET_USERS',
       payload: items,
     });
+  };
+
+  // Get a single user
+  const getUser = async (login) => {
+    setLoading();
+    
+    const response = await fetch(`${GITHUB_URL}/users/${login}`, {
+      headers: {
+        Authorization: `Bearer ${GITHUB_TOKEN}`,
+      },
+    });
+
+    if(response.status === 404){
+      window.location = '/notfound'
+    } else {
+      const data = await response.json()
+      dispatch({
+        type: 'GET_USER',
+        payload: data,
+      })
+    }
   };
 
   const setLoading = () =>
@@ -51,7 +73,14 @@ export const GithubProvider = ({ children }) => {
 
   return (
     <GithubContext.Provider
-      value={{ users: state.users, loading: state.loading, searchUsers, ClearResults }}
+      value={{
+        users: state.users,
+        user: state.user,
+        loading: state.loading,
+        searchUsers,
+        ClearResults,
+        getUser,
+      }}
     >
       {children}
     </GithubContext.Provider>
